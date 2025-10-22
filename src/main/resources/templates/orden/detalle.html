@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Detalle Orden</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #000;
+        background-color: #f5f5f5;
+        font-size: 13px;
+      }
+
+      .detalle-container {
+        max-width: 800px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        font-size: 16px;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      p {
+        margin: 10px 0;
+        font-size: 13px;
+      }
+
+      strong {
+        color: #444;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 13px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f0f0f0;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-top: 15px;
+        margin-right: 10px;
+      }
+
+      .btn-success {
+        background-color: #28a745;
+        color: #fff;
+      }
+
+      .btn-success:hover {
+        background-color: #218838;
+      }
+
+      .btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+      }
+
+      .btn-danger:hover {
+        background-color: #c82333;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+        color: #fff;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-secondary:hover {
+        background-color: #5a6268;
+      }
+
+      .btn-volver {
+        display: inline-block;
+        background-color: #6c757d;
+        color: #fff;
+        padding: 8px 16px;
+        font-size: 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+      }
+
+      .btn-volver:hover {
+        background-color: #5a6268;
+      }
+    </style>
+  </head>
+  <body>
+    <div layout:fragment="contenido">
+      <div style="max-width: 800px; margin: 15px auto">
+        <a href="/compras/ordenes" class="btn-volver">← Volver</a>
+      </div>
+      <div class="detalle-container">
+        <h1>Detalle de Orden de Compra</h1>
+
+        <p><strong>ID:</strong> <span th:text="${orden.id}"></span></p>
+        <p>
+          <strong>Proveedor:</strong>
+          <span th:text="${orden.proveedor.razonSocial}"></span>
+        </p>
+        <p>
+          <strong>Fecha:</strong> <span th:text="${orden.fechaCreacion}"></span>
+        </p>
+        <p><strong>Estado:</strong> <span th:text="${orden.estado}"></span></p>
+        <p><strong>Total:</strong> S/ <span th:text="${orden.total}"></span></p>
+
+        <h3 style="margin-top: 30px">Productos</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio Unitario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="detalle : ${orden.detalles}">
+              <td th:text="${detalle.producto.nombre}"></td>
+              <td th:text="${detalle.cantidad}"></td>
+              <td th:text="${detalle.precioUnitario}"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 20px">
+          <form
+            id="form-recibir"
+            th:action="@{'/compras/orden/' + ${orden.id} + '/recibir'}"
+            method="post"
+            style="display: inline"
+          >
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="confirmarRecepcion()"
+            >
+              Marcar como Recibida
+            </button>
+          </form>
+          <form
+            id="form-cancelar"
+            th:action="@{'/compras/orden/' + ${orden.id} + '/cancelar'}"
+            method="post"
+            style="display: inline"
+          >
+            <button
+              type="button"
+              class="btn btn-danger"
+              onclick="confirmarCancelacion()"
+            >
+              Cancelar Orden
+            </button>
+          </form>
+        </div>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+      <script>
+        function confirmarRecepcion() {
+          Swal.fire({
+            title: "¿Estás segura?",
+            text: "Esta acción marcará la orden como recibida.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, confirmar",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              document.getElementById("form-recibir").submit();
+            }
+          });
+        }
+
+        function confirmarCancelacion() {
+          Swal.fire({
+            title: "¿Cancelar esta orden?",
+            text: "Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Sí, cancelar",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              document.getElementById("form-cancelar").submit();
+            }
+          });
+        }
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Listado de Ventas</title>
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Listado de Ventas</h2>
+        <a th:href="@{/caja}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a caja
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-lila-beauty text-white">
+            <h5 class="mb-0">Ventas Registradas</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover" id="tablaVentas">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Usuario</th>
+                    <th>Cliente</th>
+                    <th>Medio de Pago</th>
+                    <th>Tipo Comprobante</th>
+                    <th>N° Comprobante</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                    <th>Motivo</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="venta, idx : ${listaVentas}">
+                    <td th:text="${venta.id}"></td>
+                    <td th:text="${venta.fechaHora != null ? #temporals.format(venta.fechaHora, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                    <td th:text="${venta.usuario != null ? venta.usuario.username : ''}"></td>
+                    <td th:text="${venta.cliente != null ? venta.cliente.nombre : 'Consumidor Final'}"></td>
+                    <td th:text="${venta.medioPago != null ? venta.medioPago.nombre : ''}"></td>
+                    <td th:text="${venta.tipoComprobante}"></td>
+                    <td th:text="${venta.numeroComprobante}"></td>
+                    <td th:text="${venta.total}"></td>
+                    <td>
+                        <span th:text="${venta.estado}" th:classappend="${venta.estado == 'FINALIZADA'} ? 'badge bg-success' : 'badge bg-danger'"></span>
+                    </td>
+                    <!-- Acciones -->
+                <td class="text-center">
+    <!-- Botón Ver Comprobante con control de acceso -->
+    <a th:href="@{/caja-venta/detalle/{id}(id=${venta.id})}" 
+       th:class="${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? 'btn btn-info btn-sm' : 'btn btn-info btn-sm disabled'"
+       th:onclick="${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? '' : 'return false;'"
+       target="_blank" title="Ver comprobante">
+        <i class="bi bi-receipt"></i>
+    </a>
+    
+    <!-- Botón Anular con control de acceso -->
+    <button type="button" 
+        th:class="${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? 'btn btn-danger btn-sm' : 'btn btn-danger btn-sm disabled'"
+        th:if="${venta.estado == 'FINALIZADA'}"
+        th:attr="data-bs-toggle=${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? 'modal' : '',data-bs-target=${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? '#anularModal__' + ${venta.id} : ''"
+        th:onclick="${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? '' : 'return false;'"
+        title="Anular">
+        <i class="bi bi-x-circle"></i>
+    </button>
+    <span th:if="${venta.estado == 'ANULADA'}" class="text-muted">Anulada</span>
+</td>
+                    <!-- Motivo -->
+                    <td class="text-center">
+                        <span th:if="${venta.estado == 'ANULADA' and venta.motivoAnulacion != null and #strings.length(venta.motivoAnulacion) > 0}">
+                            <!-- Botón Ver Motivo con control de acceso -->
+                            <a href="javascript:void(0);"
+                               th:class="${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? '' : 'disabled'"
+                               th:attr="data-bs-toggle=${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? 'modal' : '',data-bs-target=${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? '#motivoModal__' + ${idx.index} : ''"
+                               th:onclick="${esAdmin or (venta.usuario != null and venta.usuario.id == usuarioActualId)} ? '' : 'return false;'"
+                               title="Ver motivo">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modales de anulación -->
+    <div th:each="venta : ${listaVentas}" th:if="${venta.estado == 'FINALIZADA'}">
+        <div th:id="'anularModal__' + ${venta.id}" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Anular Venta</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/caja-venta/anular/{id}(id=${venta.id})}" method="post">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Motivo de anulación:</label>
+                                <textarea name="motivo" class="form-control" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger">Anular Venta</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales para ver motivo de anulación -->
+    <div th:each="venta, idx : ${listaVentas}" th:if="${venta.estado == 'ANULADA' and venta.motivoAnulacion != null and #strings.length(venta.motivoAnulacion) > 0}">
+        <div th:id="'motivoModal__' + ${idx.index}" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Motivo de Anulación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Venta #:</strong> <span th:text="${venta.id}"></span></p>
+                        <p><strong>Motivo:</strong></p>
+                        <p th:text="${venta.motivoAnulacion}"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#tablaVentas').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+            },
+            "order": [[ 0, "desc" ]],
+            "pageLength": 10
+        });
+    });
+</script>
+</body>
+</html>

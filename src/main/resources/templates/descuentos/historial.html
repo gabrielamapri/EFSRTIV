@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Historial de Descuentos</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="container mt-4">
+        <h2>Historial de Descuentos</h2>
+
+        <a th:href="@{/descuentos/activos}" class="btn btn-primary mb-3">Ver Descuentos Activos</a>
+        <a th:href="@{/descuentos/nuevo}" class="btn btn-success mb-3 ms-2">Nuevo Descuento</a>
+
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Fin</th>
+                    <th>Estado</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="descuento : ${descuentos}">
+                    <td th:text="${descuento.nombre}">Nombre</td>
+                    <td th:text="${descuento.tipo}">Tipo</td>
+                    <td>
+                        <span th:switch="${descuento.tipo}">
+                            <span th:case="'PORCENTAJE'" th:text="${descuento.valor + '%'}">%</span>
+                            <span th:case="'FIJO'" th:text="'S/ ' + ${descuento.valor}">Monto</span>
+                            <span th:case="'DOS_POR_UNO'">2x1</span>
+                        </span>
+                    </td>
+                    <td th:text="${descuento.fechaInicio}">Inicio</td>
+                    <td th:text="${descuento.fechaFin}">Fin</td>
+                    <td>
+                        <span th:if="${!descuento.activo}" class="badge bg-secondary">Inactivo</span>
+                        <span th:if="${descuento.activo}">
+                            <span th:if="${descuento.expirado}" class="badge bg-danger">Expirado</span>
+                            <span th:if="${descuento.programado}" class="badge bg-warning text-dark">Programado</span>
+                            <span th:if="${descuento.enCurso}" class="badge bg-success">Activo</span>
+                        </span>
+                    </td>
+                    <td th:text="${descuento.producto != null ? descuento.producto.nombre : '-'}">Producto</td>
+                    <td th:text="${descuento.categoria != null ? descuento.categoria.nombre : '-'}">Categoría</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Compras</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow border-0">
+
+            <!-- Encabezado -->
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-card-list me-2"></i>
+                    Historial de Compras
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <!-- Tabla de ventas -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle text-center">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Método de Pago</th>
+                            <th>Cliente</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="compra : ${compras}">
+                            <td th:text="${compra.id}"></td>
+                            <td th:text="${compra.fechaHora != null ? #temporals.format(compra.fechaHora, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
+                            <td th:text="${compra.total != null ? (#numbers.formatDecimal(compra.total, 1, 'COMMA', 2, 'POINT') + ' S/') : '0.00 S/'}"></td>
+                            <td th:text="${compra.medioPago != null ? compra.medioPago.nombre : 'N/A'}"></td>
+                            <td th:text="${compra.cliente != null ? (compra.cliente.nombre + ' ' + compra.cliente.apellido) : 'Cliente anónimo'}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Botón volver -->
+                <div class="mt-0 text-end">
+                    <a th:href="@{/clientesVista/listado}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle"></i> Volver al menú
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de paginación -->
+        <div class="mt-4 d-flex justify-content-center" th:if="${totalPages > 1}">
+            <nav>
+                <ul class="pagination">
+                    <!-- Anterior -->
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{'/historial/cliente/' + ${dni}(page=${currentPage - 1})}">Anterior</a>
+                    </li>
+
+                    <!-- Páginas -->
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{'/historial/cliente/' + ${dni}(page=${i})}"
+                           th:text="${i + 1}"></a>
+                    </li>
+
+                    <!-- Siguiente -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{'/historial/cliente/' + ${dni}(page=${currentPage + 1})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

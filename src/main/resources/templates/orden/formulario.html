@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Nueva Orden de Compra</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #F8F6FB 0%, #E6DFEE 100%);
+        color: #3d2c4a;
+        font-size: 13px;
+      }
+
+      .form-container {
+        max-width: 800px;
+        margin: 30px auto;
+        background: rgba(255,255,255,0.98);
+        padding: 32px 36px 28px 36px;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(139,90,150,0.10);
+        border: 1px solid #e6dfee;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #9D4EDD;
+        letter-spacing: 1px;
+      }
+
+      label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+        margin-top: 12px;
+        color: #8B5A96;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #B8A9D9;
+        border-radius: 10px;
+        font-size: 13px;
+        box-sizing: border-box;
+        background: #F8F6FB;
+        margin-bottom: 8px;
+      }
+
+      .productos-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-top: 20px;
+      }
+
+      .producto-card {
+        background: linear-gradient(135deg, #F8F6FB 0%, #E6DFEE 100%);
+        border: 1px solid #B8A9D9;
+        border-radius: 14px;
+        padding: 18px 16px;
+        width: calc(50% - 9px);
+        box-shadow: 0 2px 8px rgba(139,90,150,0.07);
+      }
+
+      .producto-card label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+        color: #6B4C78;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #B8A9D9 0%, #9D4EDD 100%);
+        color: #fff;
+        padding: 10px 24px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        margin-top: 24px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 600;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 8px rgba(139,90,150,0.10);
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(90deg, #9D4EDD 0%, #B8A9D9 100%);
+      }
+
+      .btn-volver {
+        display: inline-block;
+        background: linear-gradient(90deg, #B8A9D9 0%, #9D4EDD 100%);
+        color: #fff;
+        padding: 8px 18px;
+        font-size: 1rem;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: background 0.3s;
+        font-weight: 500;
+        margin-bottom: 18px;
+        box-shadow: 0 2px 8px rgba(139,90,150,0.10);
+      }
+
+      .btn-volver:hover {
+        background: linear-gradient(90deg, #9D4EDD 0%, #B8A9D9 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div layout:fragment="contenido">
+      <div style="max-width: 800px; margin: 15px auto;">
+        <a href="/compras/ordenes" class="btn-volver">← Volver</a>
+      </div>
+      <div class="form-container">
+        <h1>Crear Orden de Compra</h1>
+        <form th:action="@{/compras/orden}" method="post">
+
+          <label for="proveedorNombre">Proveedor:</label>
+          <input type="text" id="proveedorNombre" class="form-control" placeholder="Escriba el nombre del proveedor" autocomplete="off" required />
+          <input type="hidden" name="ruc" id="ruc" />
+          <div id="proveedor-sugerencias" class="list-group" style="position: absolute; z-index: 10; width: 100%; display: none;"></div>
+
+          <h3 style="font-size: 14px; margin-top: 20px; color: #222">
+            Detalle de Productos:
+          </h3>
+          <div id="productos-container" class="productos-wrapper"></div>
+
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+      </div>
+
+        <script th:inline="javascript">
+          // Serializar proveedores como array JS de objetos
+          var proveedores = /*[[${proveedores}]]*/ [];
+
+          $(document).ready(function () {
+            var $input = $("#proveedorNombre");
+            var $hiddenRuc = $("#ruc");
+            var $sugerencias = $("#proveedor-sugerencias");
+
+            $input.on("input", function () {
+              var texto = $input.val().toLowerCase();
+              $sugerencias.empty();
+              if (texto.length === 0) {
+                $sugerencias.hide();
+                $hiddenRuc.val("");
+                return;
+              }
+              var coincidencias = proveedores.filter(function (prov) {
+                return prov.razonSocial && prov.razonSocial.toLowerCase().includes(texto);
+              });
+              if (coincidencias.length === 0) {
+                $sugerencias.hide();
+                $hiddenRuc.val("");
+                return;
+              }
+              coincidencias.forEach(function (prov) {
+                var $item = $("<a href='#' class='list-group-item list-group-item-action'></a>");
+                $item.text(prov.razonSocial + " (" + prov.ruc + ")");
+                $item.on("mousedown", function (e) {
+                  e.preventDefault();
+                  $input.val(prov.razonSocial);
+                  $hiddenRuc.val(prov.ruc);
+                  $sugerencias.hide();
+                  cargarProductosPorRuc(prov.ruc);
+                });
+                $sugerencias.append($item);
+              });
+              $sugerencias.show();
+            });
+
+            $input.on("blur", function () {
+              setTimeout(function () { $sugerencias.hide(); }, 200);
+              if (!$input.val()) $hiddenRuc.val("");
+            });
+
+            // Validar antes de enviar el formulario
+            $("form").on("submit", function(e) {
+              if (!$hiddenRuc.val()) {
+                alert("Debe seleccionar un proveedor de la lista.");
+                $input.focus();
+                e.preventDefault();
+                return false;
+              }
+            });
+          });
+
+          function cargarProductosPorRuc(ruc) {
+            if (ruc) {
+              $.get("/compras/productos?ruc=" + ruc, function (data) {
+                let productosHtml = "";
+                data.forEach(function (producto, index) {
+                  productosHtml += `
+                    <div class="producto-card">
+                      <input type="hidden" name="detalles[${index}].producto.id" value="${producto.id}">
+                      <label>Producto: ${producto.nombre}</label>
+                      <label>Cantidad:
+                        <input type="number" name="detalles[${index}].cantidad" min="1" />
+                      </label>
+                    </div>
+                  `;
+                });
+                $("#productos-container").html(productosHtml);
+              }).fail(function () {
+                $("#productos-container").html(
+                  "<p style='color:red;'>Error al obtener productos.</p>"
+                );
+              });
+            } else {
+              $("#productos-container").empty();
+            }
+          }
+        </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Registrar Venta</title>
+</head>
+<body>
+<div layout:fragment="contenido" class="container mt-4">
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Asignar Puntos por Venta</h5>
+        </div>
+        <div class="card-body">
+
+            <form th:action="@{/ventas/guardar}" th:object="${venta}" method="post">
+                <!-- Cliente -->
+                <div class="mb-3">
+                    <label class="form-label">Cliente</label>
+                    <select class="form-select" th:field="*{cliente.id}">
+                        <option th:each="cliente : ${clientes}"
+                                th:value="${cliente.id}"
+                                th:text="${cliente.nombre + ' ' + cliente.apellido}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Recibe puntos -->
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" th:field="*{recibePuntos}" id="recibePuntos">
+                    <label class="form-check-label" for="recibePuntos">¿Recibe puntos?</label>
+                </div>
+
+                <!-- Productos -->
+                <label class="form-label">Productos</label>
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Seleccionar</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="producto, iterStat : ${productos}">
+                            <td>
+                                <input type="checkbox" name="detalles[__${iterStat.index}__].producto.id"
+                                       th:value="${producto.id}" class="form-check-input">
+                            </td>
+                            <td th:text="${producto.nombre}">Nombre</td>
+                            <td>
+                                <input type="number" name="detalles[__${iterStat.index}__].cantidad"
+                                       class="form-control" value="1" min="1">
+                            </td>
+                            <td>
+                                <input type="text" name="detalles[__${iterStat.index}__].precioUnitario"
+                                       th:value="${producto.precio}" class="form-control" readonly>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Botón -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Registrar Venta y Asignar Puntos
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${proveedor.id} != null ? 'Editar' : 'Nuevo'">Proveedor</title>
+</head>
+<body>
+<section layout:fragment="contenido">
+    <div class="container mt-4">
+        <h2 th:text="${proveedor.id} != null ? 'Editar Proveedor' : 'Nuevo Proveedor'"></h2>
+
+        <form th:action="@{/proveedor/guardar}" th:object="${proveedor}" method="post">
+            <input type="hidden" th:field="*{id}"/>
+
+           
+
+            <div class="mb-3">
+  <label for="razonSocial" class="form-label">Razón Social</label>
+  <input type="text" th:field="*{razonSocial}" class="form-control" required>
+</div>
+
+
+            <div class="mb-3">
+                <label class="form-label">RUC:</label>
+                <input type="text" th:field="*{ruc}" class="form-control" required/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Teléfono:</label>
+                <input type="text" th:field="*{telefono}" class="form-control"/>
+            </div>
+
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a th:href="@{/proveedor}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</section>
+</body>
+</html>

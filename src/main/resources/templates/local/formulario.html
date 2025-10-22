@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Formulario de Local</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2 th:text="${local.id == null} ? 'Registrar Local' : 'Editar Local'"></h2>
+
+    <form th:action="@{/local/guardar}" th:object="${local}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" th:field="*{nombre}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Dirección:</label>
+            <input type="text" th:field="*{direccion}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="text" th:field="*{telefono}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" th:field="*{email}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Horario:</label>
+            <input type="text" th:field="*{horario}" class="form-control" required>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" th:field="*{activo}" class="form-check-input">
+            <label class="form-check-label">Activo</label>
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a th:href="@{/local}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>

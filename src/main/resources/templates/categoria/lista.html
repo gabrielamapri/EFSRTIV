@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Lista de Categorías</title>
+</head>
+
+<body>
+<div layout:fragment="contenido">
+    <h2 class="mb-4">Lista de Categorías</h2>
+
+    <span sec:authorize="hasAuthority('ADMIN')">
+        <a th:href="@{/categoria/nuevo}" class="btn btn-success mb-3">
+            <i class="bi bi-plus-circle"></i> Nueva Categoría
+        </a>
+    </span>
+    <span sec:authorize="hasAuthority('CAJA')">
+        <button class="btn btn-success mb-3" disabled>
+            <i class="bi bi-plus-circle"></i> Nueva Categoría
+        </button>
+    </span>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cat : ${categorias}">
+            <td th:text="${cat.nombre}">Nombre</td>
+            <td th:text="${cat.descripcion}">Descripción</td>
+            <td th:text="${cat.activo ? 'Sí' : 'No'}">Activo</td>
+            <td>
+                <span sec:authorize="hasAuthority('ADMIN')">
+                    <a th:href="@{'/categoria/editar/' + ${cat.id}}" class="btn btn-warning btn-sm">Editar</a>
+                    <a th:href="@{'/categoria/eliminar/' + ${cat.id}}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Eliminar esta categoría?')">Eliminar</a>
+                </span>
+                <span sec:authorize="hasAuthority('CAJA')">
+                    <button class="btn btn-warning btn-sm" disabled>Editar</button>
+                    <button class="btn btn-danger btn-sm" disabled>Eliminar</button>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

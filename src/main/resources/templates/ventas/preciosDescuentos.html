@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Precios y Descuentos</title>
+    <style>
+        /* Beauty First lighter lilac branding */
+        .lila-card {
+            background: linear-gradient(135deg, #F8F6FB 0%, #D6C6ED 100%) !important;
+            border: 1.5px solid #D6C6ED;
+        }
+        .lila-title {
+            color: #9D4EDD !important;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .lila-btn {
+            background: #9D4EDD !important;
+            border-color: #9D4EDD !important;
+            color: #fff !important;
+        }
+        .lila-btn:hover, .lila-btn:focus {
+            background: #B8A9D9 !important;
+            border-color: #B8A9D9 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="contenido" class="container mt-4">
+
+    <h2 class="mb-4">Precios y Descuentos</h2>
+
+    <div class="row g-4 mt-3">
+
+        <!-- Gestión de precios -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 lila-card">
+                <div class="card-body">
+                    <h5 class="card-title lila-title">Gestión de Precios</h5>
+                    <p class="card-text">Registrar y actualizar precios de compra y venta por producto. Validar márgenes.</p>
+                    <a th:href="@{/producto}" class="btn lila-btn">Ir a productos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Descuentos --> 
+         
+<div class="col-md-6">
+    <div class="card shadow-sm h-100 lila-card">
+        <div class="card-body">
+            <h5 class="card-title lila-title">Descuentos</h5>
+            <p class="card-text">Crear, activar o eliminar descuentos con reglas específicas por categoría o producto.</p>
+            <a th:href="@{/descuentos}" class="btn lila-btn">Ver descuentos</a>
+        </div>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+</body>
+</html>

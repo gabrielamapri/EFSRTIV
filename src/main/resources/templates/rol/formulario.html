@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>Formulario de Rol</title>
+</head>
+<body>
+<!-- Fragmento que se mostrará en la parte "contenido" del layout -->
+<div layout:fragment="contenido">
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 th:text="${rol.id == null ? 'Nuevo Rol' : 'Editar Rol'}"></h5>
+      </div>
+      <div class="card-body">
+        <!-- Formulario que envía los datos al backend -->
+        <form th:object="${rol}" th:action="${accion}" method="post">
+          <input type="hidden" th:field="*{id}">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre del Rol</label>
+            <input type="text" class="form-control" id="nombre"
+                   th:field="*{nombre}" required placeholder="Ingrese el nombre del rol">
+            <div class="form-text">
+              Ejemplo: ADMIN, USER, VENTAS, etc.
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <a href="/rol" class="btn btn-secondary">
+              <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save"></i> Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"> <!-- Usamos un layout base para que esta vista herede el diseño -->
+<head>
+    <title>Formulario de Usuario</title>
+    <!-- Librería Select2 para mejorar el diseño del combo de roles -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body>
+<!-- Fragmento que se mostrará en la parte "contenido" del layout -->
+<div layout:fragment="contenido">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 th:text="${user.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></h5>
+            </div>
+            <div class="card-body">
+                <!-- Formulario que envía los datos al backend -->
+                <form th:object="${user}" th:action="${accion}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="username"
+                               th:field="*{username}" required placeholder="Nombre de usuario">
+                    </div>
+                    <!-- Checkbox para indicar si el usuario está activo -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <!-- Solo es obligatorio si es nuevo -->
+                        <input type="password" class="form-control" id="password" name="password"
+                               th:required="${user.id == null}"
+                               placeholder="Password del usuario">
+                        <small class="form-text text-muted" th:if="${user.id != null}">
+                            Dejar en blanco para mantener la contraseña actual
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="enabled" th:field="*{enabled}">
+                            <label class="form-check-label" for="enabled">Usuario Activo</label>
+                        </div>
+                    </div>
+                    <!-- Combo de selección múltiple para asignar roles -->
+                    <div class="mb-3">
+                        <label for="roles" class="form-label">Roles</label>
+                        <select multiple class="form-select" id="roles" name="roles" required>
+                            <option th:each="rol : ${listaRoles}"
+                                    th:value="${rol.id}"
+                                    th:text="${rol.nombre}"
+                                    th:selected="${user.roles != null && user.roles.contains(rol)}">
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            Mantenga presionada la tecla Ctrl (Cmd en Mac) para seleccionar múltiples roles
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="/user" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#roles').select2({
+            placeholder: 'Seleccione los roles',
+            allowClear: true
+        });
+    });
+</script>
+</body>
+</html>

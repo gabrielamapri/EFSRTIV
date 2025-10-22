@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Formulario de Caja</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-lila-beauty text-white">
+                <h5 th:text="${caja.id == null ? 'Nueva Caja' : 'Editar Caja'}"></h5>
+            </div>
+            <div class="card-body">
+                <form th:object="${caja}" th:action="@{/caja/nuevo}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    <div class="mb-3">
+                        <label for="local" class="form-label">Local</label>
+                        <select class="form-select" id="local" th:field="*{local}" required>
+                            <option value="">Seleccione un local</option>
+                            <option th:each="local : ${locales}"
+                                    th:value="${local.id}"
+                                    th:text="${local.nombre}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="codigo" class="form-label">Código</label>
+                        <input type="text" class="form-control" id="codigo"
+                               th:field="*{codigo}" required placeholder="Código de caja" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre"
+                               th:field="*{nombre}" required placeholder="Nombre de caja" readonly>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/caja}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+</div>
+
+<script>
+// Autocompletado de campos según local
+window.addEventListener('DOMContentLoaded', function() {
+    var localSelect = document.getElementById('local');
+    var codigoInput = document.getElementById('codigo');
+    var nombreInput = document.getElementById('nombre');
+
+    if (!localSelect || !codigoInput || !nombreInput) {
+        return;
+    }
+
+    localSelect.addEventListener('change', function() {
+        var localId = this.value;
+        if (!localId) {
+            codigoInput.value = '';
+            nombreInput.value = '';
+            return;
+        }
+        fetch('/caja/siguiente-codigo?localId=' + localId)
+            .then(res => res.json())
+            .then(data => {
+                codigoInput.value = data.codigo || '';
+                nombreInput.value = data.nombre || '';
+            });
+    });
+
+    // Autocompletar al cargar la página si ya hay un local seleccionado
+    if (localSelect.value) {
+        localSelect.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+</body>
+</html>

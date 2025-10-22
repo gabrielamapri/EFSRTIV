@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Inicio</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2 class="mb-4" style="color: #8B5A96;">Bienvenido a Beauty First</h2>
+    
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0" style="border-left: 4px solid #8B5A96 !important;">
+                <div class="card-body text-center">
+                    <i class="bi bi-shop fs-1 mb-3" style="color: #8B5A96;"></i>
+                    <h5 class="card-title" style="color: #8B5A96;">Punto de Venta</h5>
+                    <p class="card-text">Gestiona cajas y procesa ventas</p>
+                        <a th:href="@{/caja}" class="btn" style="background-color: #B8A9D9; color: white;">Iniciar Venta</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0" style="border-left: 4px solid #D4AF37 !important;">
+                <div class="card-body text-center">
+                    <i class="bi bi-people fs-1 mb-3" style="color: #D4AF37;"></i>
+                    <h5 class="card-title" style="color: #D4AF37;">Clientes</h5>
+                    <p class="card-text">Administra tu base de clientes</p>
+                    <a th:href="@{/cliente}" class="btn me-2" style="background-color: #F4E19C; color: #8B7355;">Ver Lista</a>
+                        <a th:href="@{/clientesVista/nuevo}" class="btn" style="background-color: #D4AF37; color: white;">Registrar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0" style="border-left: 4px solid #B8A9D9 !important;">
+                <div class="card-body text-center">
+                    <i class="bi bi-box-seam fs-1 mb-3" style="color: #B8A9D9;"></i>
+                    <h5 class="card-title" style="color: #B8A9D9;">Productos</h5>
+                    <p class="card-text">Gestiona inventario y categorías</p>
+                        <a th:href="@{/producto}" class="btn me-2" style="background-color: #E1D5E7; color: #6B4C78;">Ver Lista</a>
+                        <span sec:authorize="hasAuthority('ADMIN')">
+                            <a th:href="@{/producto/nuevo}" class="btn me-2" style="background-color: #B8A9D9; color: white;">Registrar</a>
+                            <a th:href="@{/categoria}" class="btn" style="background-color: #B8A9D9; color: white;">Categorías</a>
+                        </span>
+                </div>
+            </div>
+        </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0" style="border-left: 4px solid #D4AF37 !important;">
+                    <div class="card-body text-center">
+                        <i class="bi bi-tag fs-1 mb-3" style="color: #D4AF37;"></i>
+                        <h5 class="card-title" style="color: #D4AF37;">Precios</h5>
+                        <p class="card-text">Consulta y gestiona precios de productos</p>
+                            <a th:href="@{/producto}" class="btn me-2" style="background-color: #D4AF37; color: white;">Ver Precios</a>
+                    </div>
+                </div>
+            </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0" style="border-left: 4px solid #8B5A96 !important;">
+                <div class="card-body text-center">
+                    <i class="bi bi-percent fs-1 mb-3" style="color: #8B5A96;"></i>
+                    <h5 class="card-title" style="color: #8B5A96;">Descuentos</h5>
+                    <p class="card-text">Gestiona promociones y ofertas</p>
+                    <a th:href="@{/descuentos}" class="btn" style="background-color: #8B5A96; color: white;">Gestionar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0" style="border-left: 4px solid #D4AF37 !important;">
+                <div class="card-body text-center">
+                    <i class="bi bi-truck fs-1 mb-3" style="color: #D4AF37;"></i>
+                    <h5 class="card-title" style="color: #D4AF37;">Proveedores</h5>
+                    <p class="card-text">Administra proveedores</p>
+                    <a th:href="@{/proveedor}" class="btn" style="background-color: #D4AF37; color: white;">Ver Lista</a>
+                    <a th:href="@{/proveedor/nuevo}" class="btn ms-2" style="background-color: #F4E19C; color: #8B7355;">Registrar</a>
+                    <a th:href="@{/compras/ordenes}" class="btn ms-2" style="background-color: #8B5A96; color: white;">Compras</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Cliente</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Registrar Nuevo Cliente</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/clientesVista/guardar}" th:object="${cliente}" method="post">
+
+                    <!-- Oculto -->
+                    <input type="hidden" th:field="*{id}" />
+
+                    <!-- DNI -->
+                    <div class="mb-3">
+                        <label class="form-label">DNI</label>
+                        <input type="text" th:field="*{dni}" class="form-control"
+                               required minlength="8" maxlength="8" pattern="[0-9]{8}" />
+                        <div class="text-danger" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></div>
+                        <div class="text-danger" th:if="${errorDni}" th:text="${errorDni}"></div>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" th:field="*{nombre}" class="form-control"
+                               required pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+" title="Solo letras y espacios" />
+                        <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                    </div>
+
+                    <!-- Apellido -->
+                    <div class="mb-3">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" th:field="*{apellido}" class="form-control"
+                               required pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+" title="Solo letras y espacios" />
+                        <div class="text-danger" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="mb-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" th:field="*{direccion}" class="form-control" required />
+                        <div class="text-danger" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" th:field="*{telefono}" class="form-control"
+                               required minlength="9" maxlength="9" pattern="[0-9]{9}" />
+                        <div class="text-danger" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" th:field="*{email}" class="form-control" required />
+                        <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+
+                    <!-- Botón -->
+                    <div class="d-flex justify-content-end mt-4">
+                        <a th:if="${cliente.dni != null}" th:href="@{'/historial/cliente/' + ${cliente.dni}}" class="btn btn-info me-2">
+                            <i class="bi bi-clock-history"></i> Ver Historial
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

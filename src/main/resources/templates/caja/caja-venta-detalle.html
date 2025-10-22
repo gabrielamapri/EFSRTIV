@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Comprobante de Pago</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; }
+        .voucher-container {
+            max-width: 430px;
+            margin: 40px auto;
+            padding: 28px 30px 22px 30px;
+            border: 1.5px solid #bdbdbd;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 2px 12px #0001;
+        }
+        .local-info {
+            text-align: center;
+            margin-bottom: 0.5em;
+            color: #444;
+        }
+        .voucher-title {
+            text-align: center;
+            font-size: 1.4em;
+            margin-bottom: 18px;
+            font-weight: bold;
+            color: #1976d2;
+            letter-spacing: 1px;
+        }
+        .voucher-section {
+            margin-bottom: 10px;
+        }
+        .voucher-label {
+            font-weight: 500;
+            width: 140px;
+            display: inline-block;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            background: #fafbfc;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 7px 8px;
+            text-align: left;
+            font-size: 0.98em;
+        }
+        th {
+            background: #f2f6fa;
+            color: #1976d2;
+            font-weight: 600;
+        }
+        tr:nth-child(even) td {
+            background: #f9f9f9;
+        }
+        hr {
+            border: none;
+            border-top: 1.5px solid #e0e0e0;
+            margin: 18px 0 14px 0;
+        }
+        .totales {
+            margin-top: 12px;
+        }
+        .totales p {
+            margin: 0.2em 0;
+            font-size: 1.05em;
+        }
+        .totales strong {
+            color: #1976d2;
+        }
+        .btn-print {
+            display: inline-block;
+            margin: 18px 5px 0 5px;
+            padding: 8px 28px;
+            border: none;
+            border-radius: 5px;
+            background: #1976d2;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 1px 4px #0002;
+            transition: background 0.2s;
+        }
+        .btn-print:hover {
+            background: #125ea8;
+        }
+        .btn-pdf {
+            display: inline-block;
+            margin: 18px 5px 0 5px;
+            padding: 8px 28px;
+            border: none;
+            border-radius: 5px;
+            background: #dc3545;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 1px 4px #0002;
+            transition: background 0.2s;
+        }
+        .btn-pdf:hover {
+            background: #c82333;
+        }
+        .btn-back {
+            display: inline-block;
+            margin: 18px 5px 0 5px;
+            padding: 8px 28px;
+            border: none;
+            border-radius: 5px;
+            background: #6c757d;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 1px 4px #0002;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-back:hover {
+            background: #495057;
+            color: #fff;
+            text-decoration: none;
+        }
+        .buttons-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media print {
+            .buttons-container {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="voucher-container">
+    <div class="local-info">
+        <strong th:text="${venta.cajaSesion.caja.local.nombre}"></strong><br>
+        <span th:text="${venta.cajaSesion.caja.local.direccion}"></span>
+    </div>
+    <div class="voucher-title">Comprobante de Pago</div>
+    <div class="voucher-section"><span class="voucher-label">Tipo:</span> <span th:text="${venta.tipoComprobante}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">N° Comprobante:</span> <span th:text="${venta.numeroComprobante}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">Fecha:</span> <span th:text="${#temporals.format(venta.fechaHora, 'yyyy-MM-dd HH:mm')}"></span></div>
+    <div class="voucher-section">
+        <span class="voucher-label">Cliente:</span>
+        <span th:if="${venta.cliente != null}">
+            <span th:text="${venta.cliente.nombre}"></span>
+            <span th:text="${' ' + (venta.cliente.apellido != null ? venta.cliente.apellido : '')}"></span>
+            <span th:if="${venta.cliente.dni != null && !#strings.isEmpty(venta.cliente.dni)}">
+                | <strong>DNI:</strong> <span th:text="${venta.cliente.dni}"></span>
+            </span>
+        </span>
+        <span th:if="${venta.cliente == null}">
+            Consumidor Final
+        </span>
+    </div>
+    <div class="voucher-section"><span class="voucher-label">Método de Pago:</span> <span th:text="${venta.medioPago.nombre}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">Cajero:</span> <span th:text="${venta.usuario.username}"></span></div>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="detalle : ${venta.detalles}">
+                <td th:text="${detalle.producto.nombre}"></td>
+                <td th:text="${detalle.cantidad}"></td>
+                <td th:text="${detalle.precioUnitario}"></td>
+                <td th:text="${detalle.subtotal}"></td>
+            </tr>
+        </tbody>
+    </table>
+    
+<div class="totales">
+    
+    <p><strong>Subtotal:</strong>
+        <span th:text="${'S/ ' + #numbers.formatDecimal(venta.subtotal + venta.descuento, 1, 'POINT', 2, 'POINT')}"></span>
+    </p>
+    <p><strong>Descuentos:</strong>
+        <span th:text="${'-S/ ' + #numbers.formatDecimal(venta.descuento, 1, 'POINT', 2, 'POINT')}" style="color: #28a745;"></span>
+    </p>
+    <p><strong>IGV (18%):</strong>
+        <span th:text="${'S/ ' + #numbers.formatDecimal(venta.impuesto, 1, 'POINT', 2, 'POINT')}"></span>
+    </p>
+    <p><strong>Total:</strong>
+        <span th:text="${'S/ ' + #numbers.formatDecimal(venta.total, 1, 'POINT', 2, 'POINT')}"></span>
+    </p>
+</div>
+    
+    <div class="buttons-container">
+        <button class="btn-print" onclick="window.print()">
+            <i class="bi bi-printer"></i> Imprimir
+        </button>
+        <button class="btn-pdf" onclick="generarPDF()">
+            <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+        </button>
+        <a th:href="@{/caja}" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver a caja
+        </a>
+    </div>
+</div>
+
+<!-- Scripts para PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+function generarPDF() {
+    const { jsPDF } = window.jspdf;
+    const element = document.querySelector('.voucher-container');
+    
+    // Ocultar botones temporalmente
+    const buttonsContainer = document.querySelector('.buttons-container');
+    buttonsContainer.style.display = 'none';
+    
+    html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const imgWidth = 210;
+        const pageHeight = 295;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        
+        let position = 0;
+        
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+        
+        // Mostrar botones de nuevo
+        buttonsContainer.style.display = 'block';
+        
+        const numeroComprobante = '[[${venta.numeroComprobante}]]';
+        pdf.save(`comprobante-${numeroComprobante}.pdf`);
+    }).catch(error => {
+        console.error('Error generando PDF:', error);
+        buttonsContainer.style.display = 'block';
+        alert('Error al generar el PDF. Por favor, inténtalo de nuevo.');
+    });
+}
+</script>
+</body>
+</html>

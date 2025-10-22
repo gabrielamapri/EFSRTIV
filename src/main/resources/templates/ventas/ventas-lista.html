@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Ventas Registradas</title>
+</head>
+<body>
+<div layout:fragment="contenido" class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Ventas Registradas</h2>
+        <a th:href="@{/ventas/nueva}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Registrar Nueva Venta
+        </a>
+    </div>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Puntos</th>
+            <th>Perfil Cliente</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="venta : ${ventas}">
+            <td th:text="${venta.id}">1</td>
+            <td th:text="${venta.cliente?.nombre + ' ' + venta.cliente?.apellido}">Nombre</td>
+            <td th:text="${#temporals.format(venta.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+            <td th:text="${venta.total}">0.00</td>
+            <td>
+                <span class="badge bg-success" th:if="${venta.recibePuntos}">Asignados</span>
+                <span class="badge bg-secondary" th:unless="${venta.recibePuntos}">No</span>
+            </td>
+            <td>
+                <a th:href="@{/cliente/{id}(id=${venta.cliente?.id})}" class="btn btn-outline-info btn-sm">
+                    <i class="bi bi-person-circle"></i> Ver Perfil
+                </a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(ventas)}">
+            <td colspan="6" class="text-center text-muted">
+                No hay ventas registradas aún.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

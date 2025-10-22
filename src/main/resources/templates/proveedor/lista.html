@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lista de Proveedores</title>
+</head>
+<body>
+<section layout:fragment="contenido">
+
+    <div class="container mt-4">
+        <h2>Lista de Proveedores</h2>
+        <a th:href="@{/proveedor/nuevo}" class="btn btn-primary mb-3">Nuevo Proveedor</a>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Razón Social</th>
+                    <th>RUC</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Contacto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="prov : ${proveedores}">
+                    <td th:text="${prov.id}"></td>
+                    <td th:text="${prov.razonSocial}"></td>
+                    <td th:text="${prov.ruc}"></td>
+                    <td th:text="${prov.direccion}"></td>
+                    <td th:text="${prov.telefono}"></td>
+                    <td th:text="${prov.email}"></td>
+                    <td th:text="${prov.contacto}"></td>
+                    <td th:text="${prov.activo ? 'Sí' : 'No'}"></td>
+                    <td>
+                        <a th:href="@{'/proveedor/editar/' + ${prov.id}}" class="btn btn-sm btn-warning">Editar</a>
+                        <a th:href="@{'/proveedor/eliminar/' + ${prov.id}}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('¿Estás seguro de eliminar este proveedor?')">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

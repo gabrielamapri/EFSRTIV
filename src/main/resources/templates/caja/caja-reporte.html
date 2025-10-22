@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Reporte de Caja</title>
+    <style>
+        .voucher-container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 24px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            background: #fafafa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .voucher-title {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 18px;
+            font-weight: bold;
+        }
+        .voucher-section {
+            margin-bottom: 12px;
+        }
+        .voucher-label {
+            font-weight: 500;
+            width: 160px;
+            display: inline-block;
+        }
+        .voucher-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .voucher-table th, .voucher-table td {
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            text-align: left;
+            font-size: 0.97em;
+        }
+        .voucher-table th {
+            background: #f2f2f2;
+        }
+        .btn {
+            padding: 7px 18px;
+            border: none;
+            border-radius: 4px;
+            background: #e0e0e0;
+            color: #222;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 8px;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+<div class="voucher-container" id="voucher">
+    <div class="voucher-title">Resumen de Transacciones de Caja</div>
+    <div class="voucher-section"><span class="voucher-label">Local:</span> <span th:text="${local}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">Código de Caja:</span> <span th:text="${codigoCaja}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">Nombre de Caja:</span> <span th:text="${nombreCaja}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">Cajero:</span> <span th:text="${cajero}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">Fecha y hora de apertura:</span> <span th:text="${#temporals.format(fechaApertura, 'yyyy-MM-dd HH:mm')}"></span></div>
+    <div class="voucher-section"><span class="voucher-label">Fecha y hora de cierre:</span> <span th:text="${#temporals.format(fechaCierre, 'yyyy-MM-dd HH:mm')}"></span></div>
+
+    <div class="voucher-section"><strong>Ventas con Tarjeta:</strong></div>
+    <table class="voucher-table" th:if="${ventasTarjeta != null and !ventasTarjeta.isEmpty()}">
+        <thead>
+            <tr>
+                <th>ID Venta</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="v : ${ventasTarjeta}">
+            <td th:text="${v[0]}"></td>
+            <td th:text="${v[1]}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${ventasTarjeta == null or ventasTarjeta.isEmpty()}"><em>No hay ventas con tarjeta.</em></div>
+    <div class="voucher-section"><span class="voucher-label">Total ventas con tarjeta:</span> <span th:text="${totalTarjeta}"></span></div>
+
+    <div class="voucher-section"><strong>Ventas con Efectivo:</strong></div>
+    <table class="voucher-table" th:if="${ventasEfectivo != null and !ventasEfectivo.isEmpty()}">
+        <thead>
+            <tr>
+                <th>ID Venta</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="v : ${ventasEfectivo}">
+            <td th:text="${v[0]}"></td>
+            <td th:text="${v[1]}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${ventasEfectivo == null or ventasEfectivo.isEmpty()}"><em>No hay ventas en efectivo.</em></div>
+    <div class="voucher-section"><span class="voucher-label">Total ventas con efectivo:</span> <span th:text="${totalEfectivo}"></span></div>
+
+    <div class="voucher-section"><span class="voucher-label">Total general:</span> <span th:text="${totalGeneral}"></span></div>
+
+    <div style="text-align: center; margin-top: 18px;">
+        <button class="btn" onclick="window.print()">Imprimir PDF</button>
+        <a th:href="@{/caja-sesion}" class="btn">Volver</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Descuentos Activos</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="container mt-4">
+        <h2 class="mb-4">Descuentos Activos</h2>
+
+        <div class="d-flex flex-wrap gap-2 justify-content-between mb-3">
+            <div class="btn-group">
+                <span sec:authorize="hasAuthority('ADMIN')">
+                    <a class="btn btn-success" th:href="@{/descuentos/nuevo}">
+                        <i class="bi bi-plus-circle"></i> Registrar nuevo descuento
+                    </a>
+                </span>
+                <span sec:authorize="hasAuthority('CAJA')">
+                    <button class="btn btn-success" disabled>
+                        <i class="bi bi-plus-circle"></i> Registrar nuevo descuento
+                    </button>
+                </span>
+                <span sec:authorize="hasAuthority('ADMIN')">
+                    <a class="btn btn-outline-secondary" th:href="@{/descuentos/historial}">
+                        <i class="bi bi-clock-history"></i> Ver historial
+                    </a>
+                </span>
+                <span sec:authorize="hasAuthority('CAJA')">
+                    <button class="btn btn-outline-secondary" disabled>
+                        <i class="bi bi-clock-history"></i> Ver historial
+                    </button>
+                </span>
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead class="table-dark text-center">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Categoría</th>
+                    <th>Producto</th>
+                    <th>Valor</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Activo</th>
+                    <th>Acción</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${descuentos}" class="text-center align-middle">
+                    <td th:text="${d.nombre}">Nombre</td>
+                    <td th:text="${d.tipo}">Tipo</td>
+                    <td th:text="${d.categoria?.nombre}">Categoría</td>
+                    <td th:text="${d.producto?.nombre}">Producto</td>
+                    <td th:text="${d.valor}">Valor</td>
+                    <td th:text="${#temporals.format(d.fechaInicio, 'dd/MM/yyyy')}">Inicio</td>
+                    <td th:text="${#temporals.format(d.fechaFin, 'dd/MM/yyyy')}">Fin</td>
+                    <td>
+                        <span class="badge bg-success" th:if="${d.activo}">Sí</span>
+                        <span class="badge bg-secondary" th:unless="${d.activo}">No</span>
+                    </td>
+                    <td>
+                        <span sec:authorize="hasAuthority('ADMIN')">
+                            <form th:action="@{/descuentos/desactivar/{id}(id=${d.id})}" method="post" th:if="${d.activo}">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-x-circle"></i> Desactivar
+                                </button>
+                            </form>
+                        </span>
+                        <span sec:authorize="hasAuthority('CAJA')">
+                            <button class="btn btn-danger btn-sm" disabled th:if="${d.activo}">
+                                <i class="bi bi-x-circle"></i> Desactivar
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

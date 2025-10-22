@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <title>Listado de Cajas</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2 class="mb-4">Listado de Cajas</h2>
+
+    <!-- Barra de búsqueda -->
+    <form th:action="@{/caja}" method="get" class="mb-3">
+        <div class="d-flex">
+            <input type="text" class="form-control form-control-sm me-2" style="max-width: 250px;" name="q"
+                   placeholder="Buscar..." th:value="${param.q}">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+        </div>
+    </form>
+
+    <!-- Mensajes de error y éxito -->
+    <div th:if="${errorEditar}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorEditar}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorEliminar}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorEliminar}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorCerrar}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorCerrar}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${cierreExitosa}" class="alert alert-success alert-dismissible fade show" role="alert">
+        Cierre de caja realizado.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-lila-beauty text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Listado de Cajas</h5>
+   <!-- BOTÓN NUEVA CAJA (líneas 45-48) -->
+<a th:href="@{/caja/nuevo}" class="btn btn-light" 
+                th:if="${#authentication.principal.authorities.?[authority == 'ADMIN'].size() > 0}">
+    <i class="bi bi-plus-circle"></i> Nueva Caja
+</a>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Local</th>
+                    <th>Fecha de Creación</th>
+                    <th>Usuario Creador</th>
+                    <th class="text-center" style="width:200px;">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="caja : ${cajas}">
+                    <td th:text="${caja.id}"></td>
+                    <td th:text="${caja.codigo}"></td>
+                    <td th:text="${caja.nombre}"></td>
+                    <td th:text="${caja.local != null ? caja.local.nombre : ''}"></td>
+                    <td th:text="${#temporals.format(caja.fechaCreacion, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${caja.usuario != null ? caja.usuario.username : ''}"></td>
+                    <td class="text-center" style="white-space:nowrap;">
+
+                       <!-- BOTÓN ELIMINAR (líneas 79-84) -->
+<a th:href="@{/caja/eliminar/{id}(id=${caja.id})}"
+   class="btn btn-danger btn-sm mx-1" title="Eliminar"
+   th:if="${#authentication.principal.authorities.?[authority == 'ADMIN'].size() > 0}"
+   th:attr="onclick=${sesionesActivas.containsKey(caja.id)} ? 'window.mostrarMensajeCajaAbierta(event)' : 'return confirm(\'¿Eliminar esta caja?\')'">
+    <i class="bi bi-trash"></i>
+</a>
+<!-- Botón Abrir Caja - VERSIÓN MEJORADA -->
+<button type="button" class="btn btn-success btn-sm mx-1"
+        th:classappend="${sesionesActivas.containsKey(caja.id)} ? 'disabled' : ''"
+        th:disabled="${sesionesActivas.containsKey(caja.id)}"
+        th:onclick="${usuarioTieneCajaAbierta && !esAdmin} ? 'alert(\'Error: ya tiene una caja abierta\');' : (${sesionesActivas.containsKey(caja.id)} ? 'return false;' : '')"
+        th:attr="data-bs-toggle=${!sesionesActivas.containsKey(caja.id) && (!usuarioTieneCajaAbierta || esAdmin)} ? 'modal' : null, data-bs-target=${!sesionesActivas.containsKey(caja.id) && (!usuarioTieneCajaAbierta || esAdmin)} ? '#abrirCajaModal__' + ${caja.id} : null"
+        th:title="${sesionesActivas.containsKey(caja.id)} ? 'Caja ya está abierta' : 'Abrir Caja'">
+    <i class="bi bi-box-arrow-in-right"></i>
+    <span th:if="${sesionesActivas.containsKey(caja.id)}" class="text-muted"> </span>
+</button>
+                        <!-- Botón Cerrar Caja -->
+                        <button type="button" class="btn btn-secondary btn-sm mx-1"
+                                data-bs-toggle="modal"
+                                th:attr="data-bs-target='#cerrarCajaModal__' + ${caja.id}"
+                                th:disabled="${!sesionesActivas.containsKey(caja.id)}"
+                                title="Cerrar Caja">
+                            <i class="bi bi-box-arrow-left"></i>
+                        </button>
+                        <!-- Botón Iniciar Ventas -->
+                        <button th:if="${sesionesActivas.containsKey(caja.id)}"
+                                type="button"
+                                class="btn btn-primary btn-sm mx-1"
+                                data-bs-toggle="modal"
+                                th:attr="data-bs-target='#modalCliente_' + ${caja.id}" title="Iniciar Ventas">
+                            <i class="bi bi-cart"></i>
+                        </button>
+                        <button th:if="${!sesionesActivas.containsKey(caja.id)}"
+                                class="btn btn-primary btn-sm mx-1" disabled title="Iniciar Ventas">
+                            <i class="bi bi-cart"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="mt-3 text-end">
+                <a th:href="@{/caja-sesion}" class="btn btn-info">
+                    <i class="bi bi-clock-history"></i> Ver Sesiones
+                </a>
+            </div>
+            
+            <!-- MODALES -->
+            <div th:each="caja : ${cajas}">
+                <!-- Modal Abrir Caja -->
+                <div th:id="'abrirCajaModal__' + ${caja.id}" class="modal fade" tabindex="-1"
+                     th:attr="aria-labelledby='abrirCajaLabel__' + ${caja.id}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{/caja-sesion/abrir}" method="post" th:onsubmit="'guardarAperturaCaja(event, ' + ${caja.id} + ')'" >
+                                <input type="hidden" name="cajaId" th:value="${caja.id}" />
+                                <div class="modal-header">
+                                    <h5 class="modal-title" th:id="'abrirCajaLabel__' + ${caja.id}">Abrir Caja</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Monto Inicial</label>
+                                       <input type="number" class="form-control" name="montoInicial" required min="200" step="0.01" placeholder="Monto mínimo S/ 200.00">
+                                    </div>
+                                    <div class="alert alert-success alert-apertura-exito mt-2 d-none"></div>
+                                    <div class="alert alert-danger alert-apertura-error mt-2 d-none"></div>
+                                    <!-- Botón Imprimir Voucher de Apertura (oculto al inicio) -->
+                                    <button type="button" class="btn btn-secondary d-none mt-2"
+                                            th:attr="id='btnImprimirVoucherApertura__' + ${caja.id}"
+                                            th:onclick="'imprimirVoucherApertura(' + ${caja.id} + ')'" >
+                                        Imprimir Voucher de Apertura
+                                    </button>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal Cerrar Caja -->
+                <div th:id="'cerrarCajaModal__' + ${caja.id}" class="modal fade" tabindex="-1"
+                     th:attr="aria-labelledby='cerrarCajaLabel__' + ${caja.id}" aria-hidden="true"
+                     data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{/caja-sesion/cerrar-sesion}" method="post" th:onsubmit="guardarCierreCaja(event, [[${caja.id}]])">
+                                <input type="hidden" name="cajaSesionId" th:value="${sesionesActivas.containsKey(caja.id) ? sesionesActivas.get(caja.id).id : ''}" />
+                                <!-- Campos ocultos para voucher -->
+                                <input type="hidden" name="voucher_codigoCaja" th:value="${caja.codigo}" />
+                                <input type="hidden" name="voucher_nombreCaja" th:value="${caja.nombre}" />
+                                <input type="hidden" name="voucher_usuario" th:value="${#authentication.name}" />
+                                <input type="hidden" name="voucher_rol" th:value="${#authentication.principal.authorities[0].authority}" />
+                                <div class="modal-header">
+                                    <h5 class="modal-title" th:id="'cerrarCajaLabel__' + ${caja.id}">Cerrar Caja</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3" th:if="${sesionesActivas.containsKey(caja.id)}">
+                                        <label class="form-label">Monto según sistema</label>
+                                        <input type="number" class="form-control" name="montoSistema"
+                                               th:value="${#numbers.formatDecimal(@cajaVentaService.calcularTotalEnCajaIncluyendoInicial(sesionesActivas.get(caja.id)?.id), 1, 'POINT', 2, 'POINT')}"
+                                               readonly>
+                                    </div>
+                                    <div class="mb-3" th:unless="${sesionesActivas.containsKey(caja.id)}">
+                                        <label class="form-label">Monto según sistema</label>
+                                        <input type="number" class="form-control" name="montoSistema" value="0.00" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Monto contado (cierre)</label>
+                                        <input type="number" class="form-control" name="montoFisico" required min="0" step="0.01"
+                                               th:attr="id='montoFisico__' + ${caja.id}" oninput="calcularDiferencia(this)">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Diferencia</label>
+                                        <input type="text" class="form-control" readonly
+                                               th:attr="id='diferencia__' + ${caja.id}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Observaciones</label>
+                                        <textarea class="form-control" name="observaciones" rows="2"></textarea>
+                                    </div>
+                                    <div class="alert alert-success alert-cierre-exito mt-2 d-none"></div>
+                                    <div class="alert alert-danger alert-cierre-error mt-2 d-none"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                    <a th:href="@{/caja-sesion/reporte/{id}(id=${sesionesActivas.get(caja.id)?.id})}"
+                                       class="btn btn-info"
+                                       th:if="${sesionesActivas.containsKey(caja.id)}"
+                                       target="_blank">
+                                        Ver Transacciones
+                                    </a>
+                                    <!-- Botón para imprimir voucher simple -->
+                                    <button type="button" class="btn btn-secondary"
+                                            th:attr="onclick='imprimirVoucherCierre(' + ${caja.id} + ')'" >
+                                        Imprimir Voucher de Cierre
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal Cliente para Iniciar Venta -->
+                <div th:id="'modalCliente_' + ${caja.id}" class="modal fade" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{/caja/carrito}" method="get">
+                                <input type="hidden" name="cajaId" th:value="${caja.id}" />
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Asociar Cliente a la Venta</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Mensaje de error para cliente no registrado -->
+                                    <div th:id="'cliente-error-' + ${caja.id}" class="alert alert-danger d-none" role="alert"></div>
+                                    <a th:id="'btn-registrar-cliente-' + ${caja.id}"
+                                       th:href="@{/clientesVista/listado}"
+                                       class="btn btn-outline-primary d-none mt-2"
+                                       target="_blank">
+                                        Registrar cliente
+                                    </a>
+                                    <div class="mb-3">
+                                        <label class="form-label" th:for="'dniInput__' + ${caja.id}">Buscar por DNI</label>
+                                        <input type="text" class="form-control" th:id="'dniInput__' + ${caja.id}" name="dni" placeholder="Ingrese DNI del cliente">
+                                        <button type="button" class="btn btn-secondary btn-sm mt-2 btn-buscar-cliente"
+                                                th:attr="data-caja-id=${caja.id}">Buscar</button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" th:for="'nombreCliente__' + ${caja.id}">Nombre</label>
+                                        <input type="text" class="form-control" th:id="'nombreCliente__' + ${caja.id}" name="nombre" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" th:for="'apellidoCliente__' + ${caja.id}">Apellido</label>
+                                        <input type="text" class="form-control" th:id="'apellidoCliente__' + ${caja.id}" name="apellido" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" th:for="'telefonoCliente__' + ${caja.id}">Teléfono</label>
+                                        <input type="text" class="form-control" th:id="'telefonoCliente__' + ${caja.id}" name="telefono" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" th:for="'direccionCliente__' + ${caja.id}">Dirección</label>
+                                        <input type="text" class="form-control" th:id="'direccionCliente__' + ${caja.id}" name="direccion" readonly>
+                                    </div>
+                                    <input type="hidden" th:id="'clienteId__' + ${caja.id}" name="clienteId">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Iniciar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Voucher oculto para impresión de apertura -->
+                <div th:attr="id='voucher-apertura-caja__' + ${caja.id}" style="display:none;
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                    background: #fff;
+                    color: #222;
+                    max-width: 350px;
+                    margin: 0 auto;
+                    border: 2px solid #007bff;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                    padding: 24px 20px 20px 20px;">
+                    <h2 style="text-align:center; color:#007bff; margin-bottom: 18px; letter-spacing:1px;">
+                        Voucher de Apertura de Caja
+                    </h2>
+                    <hr style="margin: 0 0 12px 0; border: none; border-top: 1px solid #007bff;">
+                    <table style="width:100%; font-size: 1.05em;">
+                        <tr>
+                            <td style="font-weight:600;">Caja:</td>
+                            <td th:text="${caja.codigo} + ' - ' + ${caja.nombre}"></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">Aperturado por:</td>
+                            <td th:text="${#authentication.name}"></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">Monto Inicial:</td>
+                            <td th:attr="id='voucher-monto-inicial__' + ${caja.id}"></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">Fecha:</td>
+                            <td th:attr="id='voucher-fecha-apertura__' + ${caja.id}"></td>
+                        </tr>
+                    </table>
+                    <hr style="margin: 16px 0 0 0; border: none; border-top: 1px dashed #007bff;">
+                    <div style="text-align:center; font-size:0.95em; color:#888; margin-top:8px;">
+                        ¡Gracias por su trabajo!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Voucher oculto para impresión de cierre -->
+        <div id="voucher-cierre-caja" style="
+            display:none;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fff;
+            color: #222;
+            max-width: 350px;
+            margin: 0 auto;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px 20px 20px 20px;">
+            <h2 style="text-align:center; color:#007bff; margin-bottom: 18px; letter-spacing:1px;">
+                Voucher de Cierre de Caja
+            </h2>
+            <hr style="margin: 0 0 12px 0; border: none; border-top: 1px solid #007bff;">
+            <table style="width:100%; font-size: 1.05em;">
+                <tr>
+                    <td style="font-weight:600;">Caja:</td>
+                    <td id="voucher-caja"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:600;">Cerrado por:</td>
+                    <td id="voucher-cerrado-por"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:600;">Monto según sistema:</td>
+                    <td id="voucher-monto-sistema"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:600;">Monto contado:</td>
+                    <td id="voucher-monto-fisico"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:600;">Diferencia:</td>
+                    <td id="voucher-diferencia"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:600;">Observaciones:</td>
+                    <td id="voucher-observaciones"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:600;">Fecha:</td>
+                    <td id="voucher-fecha"></td>
+                </tr>
+            </table>
+            <hr style="margin: 16px 0 0 0; border: none; border-top: 1px dashed #007bff;">
+            <div style="text-align:center; font-size:0.95em; color:#888; margin-top:8px;">
+                ¡Gracias por su trabajo!
+            </div>
+        </div>
+        
+        <!-- JavaScript -->
+        <script th:inline="javascript">
+            if (window.location.search.includes('aperturaExitosa=true')) {
+                alert('Apertura de caja realizada.');
+                var url = new URL(window.location);
+                url.searchParams.delete('aperturaExitosa');
+                window.history.replaceState({}, document.title, url.pathname + url.search);
+            }
+            
+            var aperturaExitosa = /*[[${param.aperturaExitosa}]]*/ false;
+            if (aperturaExitosa && aperturaExitosa.toString() === "true") {
+                setTimeout(function() {
+                    var modals = document.querySelectorAll('.modal.show');
+                    modals.forEach(function(modal) {
+                        var modalInstance = bootstrap.Modal.getInstance(modal);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                    });
+                }, 500);
+            }
+            
+            window.mostrarMensajeCajaAbierta = function(event) {
+                event.preventDefault();
+                alert("Esta caja se encuentra abierta, no puede ser eliminada");
+            };
+            
+            // Delegación de eventos para buscar cliente
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn-buscar-cliente')) {
+                    var cajaId = e.target.getAttribute('data-caja-id');
+                    var dni = document.getElementById('dniInput__' + cajaId).value;
+                    var errorDiv = document.getElementById('cliente-error-' + cajaId);
+                    var btnRegistrar = document.getElementById('btn-registrar-cliente-' + cajaId);
+
+                    if (!dni) {
+                        errorDiv.classList.add('d-none');
+                        btnRegistrar.classList.add('d-none');
+                        document.getElementById('nombreCliente__' + cajaId).value = '';
+                        document.getElementById('apellidoCliente__' + cajaId).value = '';
+                        document.getElementById('telefonoCliente__' + cajaId).value = '';
+                        document.getElementById('direccionCliente__' + cajaId).value = '';
+                        document.getElementById('clienteId__' + cajaId).value = '';
+                        return;
+                    }
+                    
+                    fetch('/clientes/buscar?dni=' + dni)
+                        .then(function(res) { return res.json(); })
+                        .then(function(cliente) {
+                            if (cliente && cliente.id) {
+                                document.getElementById('nombreCliente__' + cajaId).value = cliente.nombre;
+                                document.getElementById('apellidoCliente__' + cajaId).value = cliente.apellido;
+                                document.getElementById('telefonoCliente__' + cajaId).value = cliente.telefono;
+                                document.getElementById('direccionCliente__' + cajaId).value = cliente.direccion;
+                                document.getElementById('clienteId__' + cajaId).value = cliente.id;
+                                errorDiv.classList.add('d-none');
+                                btnRegistrar.classList.add('d-none');
+                            } else {
+                                errorDiv.textContent = 'Cliente no registrado';
+                                errorDiv.classList.remove('d-none');
+                                btnRegistrar.classList.remove('d-none');
+                                document.getElementById('nombreCliente__' + cajaId).value = '';
+                                document.getElementById('apellidoCliente__' + cajaId).value = '';
+                                document.getElementById('telefonoCliente__' + cajaId).value = '';
+                                document.getElementById('direccionCliente__' + cajaId).value = '';
+                                document.getElementById('clienteId__' + cajaId).value = '';
+                            }
+                        });
+                }
+            });
+
+            // Script para calcular diferencia en cierre de caja
+            function calcularDiferencia(input) {
+                var modal = input.closest('.modal-content');
+                var montoSistemaInput = modal.querySelector('input[name="montoSistema"]');
+                var diferenciaInput = modal.querySelector('input[id^="diferencia__"]');
+                var montoSistema = parseFloat(montoSistemaInput.value) || 0;
+                var montoFisico = parseFloat(input.value) || 0;
+                var diferencia = (montoFisico - montoSistema).toFixed(2);
+                diferenciaInput.value = diferencia;
+            }
+
+            // Script para guardar cierre de caja por AJAX
+            function guardarCierreCaja(event, cajaId) {
+                event.preventDefault();
+                var form = event.target;
+                var modal = form.closest('.modal-content');
+                var exitoDiv = modal.querySelector('.alert-cierre-exito');
+                var errorDiv = modal.querySelector('.alert-cierre-error');
+                exitoDiv.classList.add('d-none');
+                errorDiv.classList.add('d-none');
+
+                var formData = new FormData(form);
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => {
+                    if (res.ok) {
+                        exitoDiv.textContent = 'Cierre de caja realizado.';
+                        exitoDiv.classList.remove('d-none');
+                        errorDiv.classList.add('d-none');
+                        var btnGuardar = modal.querySelector('button[type="submit"]');
+                        if (btnGuardar) btnGuardar.disabled = true;
+                    } else {
+                        throw new Error();
+                    }
+                })
+                .catch(() => {
+                    errorDiv.textContent = 'Ocurrió un error al cerrar la caja.';
+                    errorDiv.classList.remove('d-none');
+                    exitoDiv.classList.add('d-none');
+                });
+            }
+
+            document.querySelectorAll('.modal').forEach(function(modalEl) {
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    if (modalEl.querySelector('.alert-cierre-exito') && 
+                        !modalEl.querySelector('.alert-cierre-exito').classList.contains('d-none')) {
+                        window.location.reload();
+                    }
+                });
+            });
+            
+            // Voucher de cierre de caja
+            function imprimirVoucherCierre(cajaId) {
+                var modal = document.querySelector('#cerrarCajaModal__' + cajaId + ' .modal-content');
+                var montoSistema = modal.querySelector('input[name="montoSistema"]').value;
+                var montoFisico = modal.querySelector('input[name="montoFisico"]').value;
+                var diferencia = modal.querySelector('input[id^="diferencia__"]').value;
+                var observaciones = modal.querySelector('textarea[name="observaciones"]').value;
+
+                var codigoCaja = modal.querySelector('input[name="voucher_codigoCaja"]').value;
+                var nombreCaja = modal.querySelector('input[name="voucher_nombreCaja"]').value;
+                var usuario = modal.querySelector('input[name="voucher_usuario"]').value;
+                var rol = modal.querySelector('input[name="voucher_rol"]').value.replace(/^ROLE_/, '');
+                var nombreCompletoCaja = codigoCaja + ' - ' + nombreCaja;
+
+                var fecha = new Date().toLocaleString();
+
+                document.getElementById('voucher-caja').textContent = nombreCompletoCaja;
+                document.getElementById('voucher-cerrado-por').textContent = rol + ' - ' + usuario;
+                document.getElementById('voucher-monto-sistema').textContent = montoSistema;
+                document.getElementById('voucher-monto-fisico').textContent = montoFisico;
+                document.getElementById('voucher-diferencia').textContent = diferencia;
+                document.getElementById('voucher-observaciones').textContent = observaciones;
+                document.getElementById('voucher-fecha').textContent = fecha;
+
+                var voucher = document.getElementById('voucher-cierre-caja');
+                voucher.style.display = 'block';
+                var originalBody = document.body.innerHTML;
+                document.body.innerHTML = voucher.outerHTML;
+                window.print();
+                document.body.innerHTML = originalBody;
+                location.reload();
+            }
+
+            // Voucher de apertura de caja
+            function guardarAperturaCaja(event, cajaId) {
+                event.preventDefault();
+                var form = event.target;
+                var modal = form.closest('.modal-content');
+                var exitoDiv = modal.querySelector('.alert-apertura-exito');
+                var errorDiv = modal.querySelector('.alert-apertura-error');
+                exitoDiv.classList.add('d-none');
+                errorDiv.classList.add('d-none');
+
+                var formData = new FormData(form);
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => {
+                    if (res.ok) {
+                        exitoDiv.textContent = 'Apertura de caja realizada.';
+                        exitoDiv.classList.remove('d-none');
+                        errorDiv.classList.add('d-none');
+                        var btnImprimir = document.getElementById('btnImprimirVoucherApertura__' + cajaId);
+                        btnImprimir.classList.remove('d-none');
+                        document.getElementById('voucher-monto-inicial__' + cajaId).textContent = form.querySelector('input[name="montoInicial"]').value;
+                        document.getElementById('voucher-fecha-apertura__' + cajaId).textContent = new Date().toLocaleString();
+                        var btnGuardar = modal.querySelector('button[type="submit"]');
+                        if (btnGuardar) btnGuardar.disabled = true;
+                    } else {
+                        throw new Error();
+                    }
+                })
+                .catch(() => {
+                    errorDiv.textContent = 'Ocurrió un error al abrir la caja.';
+                    errorDiv.classList.remove('d-none');
+                    exitoDiv.classList.add('d-none');
+                });
+            }
+
+            function imprimirVoucherApertura(cajaId) {
+                var voucher = document.getElementById('voucher-apertura-caja__' + cajaId);
+                voucher.style.display = 'block';
+                var originalBody = document.body.innerHTML;
+                document.body.innerHTML = voucher.outerHTML;
+                window.print();
+                document.body.innerHTML = originalBody;
+                location.reload();
+            }
+
+            function validarMontoMinimo(form) {
+        var monto = parseFloat(form.montoInicial.value);
+        if (isNaN(monto) || monto < 200) {
+            alert("El monto inicial debe ser al menos S/ 200.00");
+            return false;
+        }
+        return true;
+    }
+
+
+            document.querySelectorAll('.modal').forEach(function(modalEl) {
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    if (modalEl.querySelector('.alert-cierre-exito') && 
+                        !modalEl.querySelector('.alert-cierre-exito').classList.contains('d-none')) {
+                        window.location.reload();
+                    }
+                    if (modalEl.querySelector('.alert-apertura-exito') && 
+                        !modalEl.querySelector('.alert-apertura-exito').classList.contains('d-none')) {
+                        window.location.reload();
+                    }
+
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Lista de Locales</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2>Lista de Locales</h2>
+
+    <a th:href="@{/local/nuevo}" class="btn btn-success mb-3">Registrar nuevo local</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="local : ${listaLocales}">
+                <td th:text="${local.nombre}">Nombre</td>
+                <td th:text="${local.direccion}">Dirección</td>
+                <td th:text="${local.telefono}">Teléfono</td>
+                <td>
+                    <a th:href="@{/local/editar/{id}(id=${local.id})}" class="btn btn-primary btn-sm">Editar</a>
+                    <a th:href="@{/local/eliminar/{id}(id=${local.id})}" 
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Estás seguro de eliminar este local?');">
+                       Eliminar
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(locales)}">
+                <td colspan="4" class="text-center text-muted">No hay locales registrados.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

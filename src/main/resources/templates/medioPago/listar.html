@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}">
+<head>
+    <title>Lista de Medios de Pago</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2>Medios de Pago</h2>
+
+    <a th:href="@{/medioPago/nuevo}" class="btn btn-primary mb-3">Nuevo Medio de Pago</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="mp : ${listaMediosPago}">
+                <td th:text="${mp.id}"></td>
+                <td th:text="${mp.nombre}"></td>
+                <td>
+                    <a th:href="@{'/medioPago/editar/' + ${mp.id}}" class="btn btn-sm btn-warning">Editar</a>
+                    <a th:href="@{'/medioPago/eliminar/' + ${mp.id}}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('¿Estás seguro de eliminar este medio de pago?');">
+                       Eliminar
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(listaMediosPago)}">
+                <td colspan="3" class="text-center text-muted">No hay medios de pago registrados.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

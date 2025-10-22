@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Detalle de Sesión de Caja</title>
+    <style>
+        .buttons-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn-print {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #1976d2;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        .btn-print:hover {
+            background: #125ea8;
+        }
+        @media print {
+            .buttons-container {
+                display: none !important;
+            }
+            .btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2 class="mb-4 fw-bold text-primary display-6" style="letter-spacing:1px;">
+        Detalle de Sesión de Caja:
+        <span th:text="${sesion.caja.local.nombre}"></span>
+        -
+        <span th:text="${sesion.caja.codigo}"></span>
+        -
+        <span th:text="${sesion.caja.nombre}"></span>
+    </h2>
+
+    <!-- Botón de Impresión -->
+    <div class="buttons-container">
+        <button class="btn-print" onclick="window.print()">
+            <i class="bi bi-printer"></i> Imprimir Detalle
+        </button>
+    </div>
+
+    <!-- Apertura -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            Apertura de caja
+        </div>
+        <div class="card-body">
+            <ul>
+                <li><strong>Usuario Apertura:</strong> <span th:text="${sesion.usuarioApertura != null ? sesion.usuarioApertura.username : ''}"></span></li>
+                <li><strong>Fecha Apertura:</strong> <span th:text="${sesion.fechaApertura != null ? #temporals.format(sesion.fechaApertura, 'yyyy-MM-dd HH:mm') : ''}"></span></li>
+                <li><strong>Monto Inicial:</strong> <span th:text="${sesion.montoInicial}"></span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Ventas con Tarjeta -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            Ventas con Tarjeta
+        </div>
+        <div class="card-body">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Fecha</th>
+                        <th>DNI Cliente</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="venta : ${ventasTarjeta}">
+                        <td th:text="${venta[0]}"></td>
+                        <td th:text="${#temporals.format(venta[4], 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${venta[5] != null and !#strings.isEmpty(venta[5]) ? venta[5] : 'Sin DNI'}"></td>
+                        <td th:text="${venta[1]}"></td>
+                        <td th:text="${venta[3]}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(ventasTarjeta)}">
+                        <td colspan="5" class="text-center text-muted">No hay ventas con tarjeta.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="fw-bold text-end">Total ventas con tarjeta: <span th:text="${totalTarjeta}"></span></div>
+        </div>
+    </div>
+
+    <!-- Ventas con Efectivo -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            Ventas con Efectivo
+        </div>
+        <div class="card-body">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Fecha</th>
+                        <th>DNI Cliente</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="venta : ${ventasEfectivo}">
+                        <td th:text="${venta[0]}"></td>
+                        <td th:text="${#temporals.format(venta[4], 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${venta[5] != null and !#strings.isEmpty(venta[5]) ? venta[5] : 'Sin DNI'}"></td>
+                        <td th:text="${venta[1]}"></td>
+                        <td th:text="${venta[3]}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(ventasEfectivo)}">
+                        <td colspan="5" class="text-center text-muted">No hay ventas en efectivo.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="fw-bold text-end">Total ventas con efectivo: <span th:text="${totalEfectivo}"></span></div>
+        </div>
+    </div>
+
+    <!-- Total General -->
+    <div class="fw-bold text-end mb-4">
+        Total general: <span th:text="${totalGeneral}"></span>
+    </div>
+
+    <!-- Voucher de Cierre -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            Cierre de caja
+        </div>
+        <div class="card-body">
+            <ul>
+                <li><strong>Usuario Cierre:</strong> <span th:text="${sesion.usuarioCierre != null ? sesion.usuarioCierre.username : '-'}"></span></li>
+                <li><strong>Fecha Cierre:</strong> <span th:text="${sesion.fechaCierre != null ? #temporals.format(sesion.fechaCierre, 'yyyy-MM-dd HH:mm') : '-'}"></span></li>
+                <li><strong>Monto según sistema:</strong> <span th:text="${montoSistema != null ? montoSistema : '-'}"></span></li>
+                <li><strong>Monto Contado:</strong> <span th:text="${sesion.montoCierre != null ? sesion.montoCierre : '-'}"></span></li>
+                <li><strong>Diferencia:</strong> <span th:text="${diferencia != null ? diferencia : '-'}"></span></li>
+                <li><strong>Observaciones:</strong> <span th:text="${observaciones != null ? observaciones : '-'}"></span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/caja-sesion}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Sesiones
+        </a>
+    </div>
+</div>
+</body>
+</html>

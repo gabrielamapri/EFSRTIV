@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Precios con Descuento</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="container mt-4">
+        <h2>Precios con Descuento Aplicado</h2>
+
+        <a th:href="@{/descuentos/activos}" class="btn btn-secondary mb-3">Volver a Descuentos</a>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Precio Original</th>
+                <th>Descuento Aplicado</th>
+                <th>Precio Final</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="producto : ${productos}">
+                <td th:text="${producto.nombre}">Nombre</td>
+                <td th:text="${producto.precio + ' soles'}">Precio</td>
+                <td th:text="${producto.descuentoAplicado != null ? producto.descuentoAplicado.tipo : 'Sin descuento'}">Tipo Descuento</td>
+                <td th:text="${producto.precioFinal + ' soles'}">Precio Final</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

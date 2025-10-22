@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Nuevo Descuento</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="container mt-4">
+        <h2>Nuevo Descuento</h2>
+        <form th:action="@{/descuentos/guardar}" th:object="${descuento}" method="post">
+
+            <div class="mb-3">
+                <label class="form-label">Nombre del Descuento</label>
+                <input type="text" class="form-control" th:field="*{nombre}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tipo de Descuento</label>
+                <select class="form-select" th:field="*{tipo}">
+                    <option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo}">Tipo</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Porcentaje / Monto</label>
+                <input type="number" class="form-control" step="0.01" th:field="*{valor}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Fecha de Inicio</label>
+                <input type="date" class="form-control" th:field="*{fechaInicio}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Fecha de Fin</label>
+                <input type="date" class="form-control" th:field="*{fechaFin}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Condición mínima (opcional)</label>
+                <input type="number" class="form-control" step="0.01" th:field="*{condicionMinimaPrecio}">
+            </div>
+
+            <!-- Producto por ID -->
+            <div class="mb-3">
+                <label class="form-label">Aplicar a Producto</label>
+                <select class="form-select" name="productoId">
+                    <option value="">-- Ninguno --</option>
+                    <option th:each="prod : ${productos}" th:value="${prod.id}" th:text="${prod.nombre}"></option>
+                </select>
+            </div>
+
+            <!-- Categoría por ID -->
+            <div class="mb-3">
+                <label class="form-label">Aplicar a Categoría</label>
+                <select class="form-select" name="categoriaId">
+                    <option value="">-- Ninguna --</option>
+                    <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
+                </select>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" th:field="*{activo}" id="activo">
+                <label class="form-check-label" for="activo">Activo</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a th:href="@{/descuentos/activos}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>

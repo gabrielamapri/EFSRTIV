@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Perfil del Cliente</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2>Perfil del Cliente</h2>
+
+    <p><strong>Nombre:</strong> <span th:text="${cliente.nombre}">Nombre</span> <span th:text="${cliente.apellido}">Apellido</span></p>
+    <p><strong>DNI:</strong> <span th:text="${cliente.dni}">00000000</span></p>
+    <p><strong>Tipo:</strong> <span th:text="${cliente.tipo}">regular</span></p>
+    <p><strong>Puntos acumulados:</strong> <span th:text="${cliente.puntosAcumulados}">0</span></p>
+
+    <a th:href="@{/cliente}" class="btn btn-secondary mt-3">
+        <i class="bi bi-arrow-left"></i> Volver a lista
+    </a>
+</div>
+</body>
+</html>

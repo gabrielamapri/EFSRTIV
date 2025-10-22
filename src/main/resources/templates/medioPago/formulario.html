@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}">
+<head>
+    <title>Formulario Medio de Pago</title>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <h2 th:text="${medioPago.id == null ? 'Registrar' : 'Editar'} + ' Medio de Pago'"></h2>
+
+    <form th:action="@{${accion}}" th:object="${medioPago}" method="post">
+        <div class="mb-3">
+            <label class="form-label">Nombre del Medio de Pago</label>
+            <input type="text" th:field="*{nombre}" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a th:href="@{/medioPago}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>
