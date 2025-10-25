@@ -2,7 +2,9 @@
 
 
 DELETE FROM purchase_order_items;
+ALTER TABLE purchase_order_items AUTO_INCREMENT = 1;
 DELETE FROM purchase_orders;
+ALTER TABLE purchase_orders AUTO_INCREMENT = 1;
 DELETE FROM proveedores;
 ALTER TABLE proveedores AUTO_INCREMENT = 1;
 DELETE FROM descuentos;
