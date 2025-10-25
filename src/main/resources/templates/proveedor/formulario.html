@@ -12,6 +12,24 @@
         <form th:action="@{/proveedor/guardar}" th:object="${proveedor}" method="post">
             <input type="hidden" th:field="*{id}"/>
 
+            <div class="mb-3">
+                <label class="form-label">Dirección:</label>
+                <input type="text" th:field="*{direccion}" class="form-control"/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Nombre de Contacto:</label>
+                <input type="text" th:field="*{contacto}" class="form-control"/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Estado:</label>
+                <select th:field="*{activo}" class="form-control">
+                    <option th:value="true">Activo</option>
+                    <option th:value="false">Inactivo</option>
+                </select>
+            </div>
+
            
 
             <div class="mb-3">
