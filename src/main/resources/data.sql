@@ -1,3 +1,4 @@
+DELETE FROM purchase_order_items;
 DELETE FROM descuentos;
 ALTER TABLE descuentos AUTO_INCREMENT = 1;
 DELETE FROM clientes;
