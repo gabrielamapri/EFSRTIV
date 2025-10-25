@@ -19,6 +19,7 @@ DELETE FROM users;
 ALTER TABLE users AUTO_INCREMENT = 1;
 DELETE FROM roles;
 ALTER TABLE roles AUTO_INCREMENT = 1;
+
 DELETE FROM descuentos;
 DELETE FROM clientes;
 DELETE FROM productos;
