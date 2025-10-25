@@ -181,6 +181,20 @@
             </span>
         </div>
     </div>
+
+     <!-- CLIENTES Y PROVEEDORES -->
+    <div class="menu-section">
+        <div class="menu-header" onclick="toggleSubmenu('personas')">
+            <span><i class="bi bi-people"></i> Personas</span>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+        </div>
+        <div class="submenu expanded" id="personas-submenu">
+            <a th:href="@{/clientesVista/listado}"><i class="bi bi-heart"></i> Clientes</a>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/proveedor}"><i class="bi bi-truck"></i> Proveedores</a>
+            </span>
+        </div>
+    </div>
     
     <!-- INVENTARIO Y PRODUCTOS -->
     <div class="menu-section">
@@ -197,20 +211,7 @@
         </div>
     </div>
     
-    <!-- CLIENTES Y PROVEEDORES -->
-    <div class="menu-section">
-        <div class="menu-header" onclick="toggleSubmenu('personas')">
-            <span><i class="bi bi-people"></i> Personas</span>
-            <i class="bi bi-chevron-down toggle-icon"></i>
-        </div>
-        <div class="submenu expanded" id="personas-submenu">
-            <a th:href="@{/clientesVista/listado}"><i class="bi bi-heart"></i> Clientes</a>
-            <span sec:authorize="hasAuthority('ADMIN')">
-                <a th:href="@{/proveedor}"><i class="bi bi-truck"></i> Proveedores</a>
-            </span>
-        </div>
-    </div>
-    
+
     <!-- CONFIGURACIÓN -->
     <div class="menu-section">
         <div class="menu-header" onclick="toggleSubmenu('configuracion')">
