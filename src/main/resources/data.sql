@@ -1,12 +1,16 @@
+
+
+
 DELETE FROM purchase_order_items;
+DELETE FROM purchase_orders;
+DELETE FROM proveedores;
+ALTER TABLE proveedores AUTO_INCREMENT = 1;
 DELETE FROM descuentos;
 ALTER TABLE descuentos AUTO_INCREMENT = 1;
 DELETE FROM clientes;
 ALTER TABLE clientes AUTO_INCREMENT = 1;
 DELETE FROM productos;
 ALTER TABLE productos AUTO_INCREMENT = 1;
-DELETE FROM proveedores;
-ALTER TABLE proveedores AUTO_INCREMENT = 1;
 DELETE FROM categorias;
 ALTER TABLE categorias AUTO_INCREMENT = 1;
 DELETE FROM medios_pago;
@@ -20,18 +24,6 @@ DELETE FROM users;
 ALTER TABLE users AUTO_INCREMENT = 1;
 DELETE FROM roles;
 ALTER TABLE roles AUTO_INCREMENT = 1;
-
-DELETE FROM descuentos;
-DELETE FROM clientes;
-DELETE FROM productos;
-DELETE FROM proveedores;
-DELETE FROM categorias;
-DELETE FROM medios_pago;
-DELETE FROM cajas;
-DELETE FROM locales;
-DELETE FROM users_roles;
-DELETE FROM users;
-DELETE FROM roles;
 
 INSERT INTO roles (nombre) VALUES
 ('USUARIOS'),
