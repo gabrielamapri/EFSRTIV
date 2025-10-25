@@ -1,3 +1,14 @@
+DELETE FROM descuentos;
+DELETE FROM clientes;
+DELETE FROM productos;
+DELETE FROM proveedores;
+DELETE FROM categorias;
+DELETE FROM medios_pago;
+DELETE FROM cajas;
+DELETE FROM locales;
+DELETE FROM users_roles;
+DELETE FROM users;
+DELETE FROM roles;
 INSERT INTO roles (nombre) VALUES
 ('USUARIOS'),
 ('ROLES'),
