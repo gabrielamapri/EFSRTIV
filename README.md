@@ -1,7 +1,8 @@
 
-# Sistema POS - Punto de Venta
 
-Este proyecto es un sistema de punto de venta (POS) para comercios, desarrollado en Java Spring Boot y Thymeleaf. Permite gestionar ventas, clientes, productos, descuentos, medios de pago, reportes y más. Incluye un sistema de puntos para fidelización de clientes.
+# Beauty First - Sistema POS para tienda de cosméticos
+
+Este proyecto es un sistema de punto de venta (POS) desarrollado para Beauty First, una tienda especializada en productos cosméticos. El sistema permite gestionar ventas, clientes, productos, descuentos, medios de pago, reportes y más. Incluye un sistema de puntos para fidelización de clientes y está desarrollado en Java Spring Boot y Thymeleaf.
 
 ---
 
@@ -70,11 +71,12 @@ Este proyecto es un sistema de punto de venta (POS) para comercios, desarrollado
 
 ---
 
+
 ## 👥 ¿Para quién está hecho esto?
 
 Este sistema está pensado para:
 
-- Comercios que desean fidelizar clientes con un sistema de puntos y descuentos.
+- Beauty First y otras tiendas de productos cosméticos que desean fidelizar clientes con un sistema de puntos y descuentos.
 - Administradores que quieren tener control claro sobre promociones y beneficios.
 - Equipos técnicos que necesitan integrar funciones sin afectar lo ya construido.
 
@@ -90,5 +92,5 @@ El sistema está preparado para crecer:
 
 ---
 
-🧑‍💻 Desarrollado con amor y lógica modular.  
-Si tienes dudas o mejoras, no dudes en escribirme 💬.
+
+

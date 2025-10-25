@@ -53,12 +53,12 @@ values
 
 -- CAJAS
  INSERT INTO locales (nombre, direccion, telefono, email, horario, activo) VALUES
-('Beauty First Callao', 'Av. Sáenz Peña 150, Callao', '987654321', 'callao@chafafea.com', 'L-D 9am-8pm', TRUE),
-('Beauty First  Piura', 'Av. Grau 300, Piura', '912345678', 'piura@chafafea.com', 'L-D 10am-7pm', TRUE),
-('Beauty First  Talara', 'Av. Bolognesi 450, Talara, Piura', '935678123', 'talara@chafafea.com', 'L-D 8am-9pm', TRUE),
-('Beauty First  Salaverry', 'Av. Salaverry 1200, Jesús María, Lima', '932165498', 'salayverry@chafafea.com', 'L-D 9am-6pm', TRUE),
-('Beauty First  Miraflores', 'Av. Benavides 1135, Miraflores, Lima', '934567890', 'miraflores@chafafea.com', 'L-D 7am-11pm', TRUE),
-('Beauty First  Arequipa', 'Av. Ejército 709, Cayma, Arequipa', '936789012', 'arequipa@chafafea.com', 'L-D 8am-9pm', TRUE);
+('Beauty First Callao', 'Av. Sáenz Peña 150, Callao', '987654321', 'callao@beautyfirst.com', 'L-D 9am-8pm', TRUE),
+('Beauty First  Piura', 'Av. Grau 300, Piura', '912345678', 'piura@beautyfirst.com', 'L-D 10am-7pm', TRUE),
+('Beauty First  Talara', 'Av. Bolognesi 450, Talara, Piura', '935678123', 'talara@beautyfirst.com', 'L-D 8am-9pm', TRUE),
+('Beauty First  Salaverry', 'Av. Salaverry 1200, Jesús María, Lima', '932165498', 'salayverry@beautyfirst.com', 'L-D 9am-6pm', TRUE),
+('Beauty First  Miraflores', 'Av. Benavides 1135, Miraflores, Lima', '934567890', 'miraflores@beautyfirst.com', 'L-D 7am-11pm', TRUE),
+('Beauty First  Arequipa', 'Av. Ejército 709, Cayma, Arequipa', '936789012', 'arequipa@beautyfirst.com', 'L-D 8am-9pm', TRUE);
 
 INSERT INTO cajas (codigo, nombre, fecha_creacion, local_id, usuario_id)
 VALUES
